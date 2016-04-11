@@ -30,6 +30,8 @@ public:
     void win();
     void checkWin();
 
+    void setWrapped(bool wrapped);
+
     int width() const { return m_width; }
     int height() const { return m_height; }
     int getNumberOfMines () const { return m_numberOfMines;}
@@ -59,6 +61,7 @@ private:
     bool m_generated;
     bool m_smartMined;
     bool m_gameStarted;
+    bool m_wrapped;
 
 signals:
     void changedNumberOfMines();

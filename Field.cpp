@@ -58,9 +58,7 @@ void Field::generate(int x, int y)
 
 Cell *Field::cellAt(int x, int y) const
 {
-    bool wrapped = true;
-
-    if (wrapped) {
+    if (m_wrapped) {
         if (x < 0) {
             x += m_width;
         } else if (x > m_width - 1) {
@@ -167,4 +165,9 @@ void Field::checkWin()
     if (m_numberOfUnexplosedMines == m_numberOfMines) {
         win();
     }
+}
+
+void Field::setWrapped(bool wrapped)
+{
+    m_wrapped = wrapped;
 }

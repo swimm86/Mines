@@ -42,6 +42,9 @@ private slots:
     void slotUpdateDateTime();
     void slotUpdateNumberOfMines();
     void winGame();
+    void wrappedGame(bool wrapped);
+
+    void on_action_Wrapped_triggered(bool checked);
 
 private:
     Ui::MainWindow *ui;

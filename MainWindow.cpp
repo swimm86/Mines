@@ -2,7 +2,6 @@
 #include "ui_MainWindow.h"
 #include "Field.hpp"
 #include "CellItem.hpp"
-#include "timer.h"
 
 #include <QGLWidget>
 #include <QGraphicsScene>
@@ -140,6 +139,12 @@ void MainWindow::winGame()
     labelStatus->show();
 }
 
+void MainWindow::wrappedGame(bool wrapped)
+{
+    newGame();
+    m_field->setWrapped(wrapped);
+}
+
 void MainWindow::stopTime() {
     timer->stop();
 }
@@ -147,4 +152,9 @@ void MainWindow::stopTime() {
 void MainWindow::startTime()
 {
     timer->start(1000);
+}
+
+void MainWindow::on_action_Wrapped_triggered(bool checked)
+{
+    wrappedGame(checked);
 }

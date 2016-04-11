@@ -2,9 +2,8 @@
 
 #include "Cell.hpp"
 
-Field::Field(QMainWindow *parent) : QMainWindow(parent)
+Field::Field() : QObject()
 {
-
 }
 
 void Field::setSize(int width, int height)
@@ -16,7 +15,9 @@ void Field::setSize(int width, int height)
     for (int y = 0; y < height; ++y) {
 
         for (int x = 0; x < width; ++x) {
-            m_cells.append(new Cell(this, x, y));
+            Cell *cell = new Cell(this, x, y);
+            connect(cell, SIGNAL(checkWin()), this, SLOT(checkWin()));
+            m_cells.append(cell);
         }
     }
 }

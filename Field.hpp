@@ -7,13 +7,13 @@
 
 class Cell;
 
-class Field : public QMainWindow
+class Field : public QObject
 {
     Q_OBJECT
-public:
-    explicit Field(QMainWindow *parent = 0);
 
 public:
+    Field();
+
     void setSize(int width, int height);
     void setNumberOfMines(int number);
 
@@ -28,7 +28,7 @@ public:
     void disableText();
     void restartTime();
     void win();
-    void checkWin();
+//    void checkWin();
 
     void setWrapped(bool wrapped);
 
@@ -68,6 +68,9 @@ signals:
     void stopTimer();
     void startTimer();
     void winGame();
+
+protected slots:
+    void checkWin();
 };
 
 #endif // FIELD_HPP

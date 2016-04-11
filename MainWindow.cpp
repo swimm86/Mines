@@ -141,8 +141,8 @@ void MainWindow::winGame()
 
 void MainWindow::wrappedGame(bool wrapped)
 {
-    newGame();
     m_field->setWrapped(wrapped);
+    newGame();
 }
 
 void MainWindow::stopTime() {

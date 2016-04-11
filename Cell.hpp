@@ -2,14 +2,17 @@
 #define CELL_HPP
 
 #include <QVector>
+#include <QMainWindow>
+#include <QObject>
 
-class Field;
-
-class Cell
+class Cell : public QObject
 {
-public:
-    Cell(Field *field, int x, int y);
+    Q_OBJECT
 
+public:
+    Cell(int x = 0, int y = 0);
+
+public:
     int x() const { return m_x; }
     int y() const { return m_y; }
 
@@ -20,6 +23,7 @@ public:
     void setMined(bool mined);
     void setDefused(bool defused);
     void setOpened(bool opened);
+    void setNeighbors(const QVector<Cell*> &neighbors);
 
     bool isOpen() const { return m_open; }
     bool isSuspect() const { return m_suspect; }
@@ -36,8 +40,6 @@ public:
     QVector<Cell*> getNeighbors() const;
 
 private:
-    Field *m_field;
-
     int m_x;
     int m_y;
 
@@ -46,6 +48,15 @@ private:
     bool m_suspect;
     bool m_mined;
     bool m_defused;
+
+    QVector<Cell*> m_neighbors;
+
+signals:
+    void checkWin();
+    void generate(int x, int y);
+    void lose();
+    void minusMine();
+    void plusMine();
 
 };
 

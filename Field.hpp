@@ -17,18 +17,13 @@ public:
     void setSize(int width, int height);
     void setNumberOfMines(int number);
 
-    void generate(int x, int y);
     void prepare();
-    void lose();
     void plusSec();
-    void plusMine();
-    void minusMine();
     void reset();
     void timeReset();
     void disableText();
     void restartTime();
     void win();
-//    void checkWin();
 
     void setWrapped(bool wrapped);
 
@@ -44,6 +39,8 @@ public:
     bool isGameStarted() const { return m_gameStarted; }
 
     Cell *cellAt(int x, int y) const;
+
+    QVector<Cell*> getNeighbors(Cell *cell) const;
 
 private:
     QVector<Cell*> m_cells;
@@ -69,8 +66,12 @@ signals:
     void startTimer();
     void winGame();
 
-protected slots:
+private slots:
     void checkWin();
+    void generate(int x, int y);
+    void lose();
+    void plusMine();
+    void minusMine();
 };
 
 #endif // FIELD_HPP

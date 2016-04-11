@@ -15,8 +15,14 @@ void Field::setSize(int width, int height)
     for (int y = 0; y < height; ++y) {
 
         for (int x = 0; x < width; ++x) {
-            Cell *cell = new Cell(this, x, y);
+            Cell *cell = new Cell(x, y);
+
             connect(cell, SIGNAL(checkWin()), this, SLOT(checkWin()));
+            connect(cell, SIGNAL(generate(int, int)), this, SLOT(generate(int, int)));
+            connect(cell, SIGNAL(lose()), this, SLOT(lose()));
+            connect(cell, SIGNAL(plusMine()), this, SLOT(plusMine()));
+            connect(cell, SIGNAL(minusMine()), this, SLOT(minusMine()));
+
             m_cells.append(cell);
         }
     }
@@ -29,31 +35,33 @@ void Field::setNumberOfMines(int number)
 
 void Field::generate(int x, int y)
 {
-    qsrand(10);
-    int minesToPlace = m_numberOfMines;
-    m_minesLeft = m_numberOfMines;
-    m_virtualMines = 0;
-    m_generated = true;
-    m_defusedMines = 0;
-    emit startTimer();
+    if (!isGenerated()) {
+        qsrand(10);
+        int minesToPlace = m_numberOfMines;
+        m_minesLeft = m_numberOfMines;
+        m_virtualMines = 0;
+        m_generated = true;
+        m_defusedMines = 0;
+        emit startTimer();
 
-    while (minesToPlace > 0) {
-        Cell *cell = m_cells.at(qrand() % m_cells.count());
+        while (minesToPlace > 0) {
+            Cell *cell = m_cells.at(qrand() % m_cells.count());
 
-        Cell *banned = cellAt(x,y);
-        QVector<Cell*> bannedCells = banned->getNeighbors();
-        bannedCells.append(banned);
+            Cell *banned = cellAt(x,y);
+            QVector<Cell*> bannedCells = banned->getNeighbors();
+            bannedCells.append(banned);
 
-        if (bannedCells.contains(cell)) {
-            continue;
+            if (bannedCells.contains(cell)) {
+                continue;
+            }
+
+            if (cell->haveMine()) {
+                continue;
+            }
+
+            cell->setHaveMine(true);
+            --minesToPlace;
         }
-
-        if (cell->haveMine()) {
-            continue;
-        }
-
-        cell->setHaveMine(true);
-        --minesToPlace;
     }
 }
 
@@ -84,12 +92,35 @@ Cell *Field::cellAt(int x, int y) const
     return m_cells.at(x + y * m_width);
 }
 
+void maybeAddCell(QVector<Cell*> *vector, Cell *cell)
+{
+    if (cell) {
+        vector->append(cell);
+    }
+}
+
+QVector<Cell *> Field::getNeighbors(Cell *cell) const
+{
+    QVector<Cell*> neighbors;
+
+    for (int x = cell->x() - 1; x <= cell->x() + 1; ++x) {
+        maybeAddCell(&neighbors, cellAt(x, cell->y() + 1));
+        maybeAddCell(&neighbors, cellAt(x, cell->y() - 1));
+    }
+
+    maybeAddCell(&neighbors, cellAt(cell->x() + 1, cell->y()));
+    maybeAddCell(&neighbors, cellAt(cell->x() - 1, cell->y()));
+
+    return neighbors;
+}
+
 void Field::prepare()
 {
     m_generated = false;
 
     for (Cell *cell : m_cells) {
         cell->reset();
+        cell->setNeighbors(getNeighbors(cell));
     }
 
     m_minesLeft = m_numberOfMines;
@@ -140,17 +171,19 @@ void Field::win()
 
 void Field::lose()
 {
-    m_lose = true;
+    if (!isLose()) {
+        m_lose = true;
 
-    for (Cell *cell : m_cells) {
-        if (cell->isMined() & cell->haveMine()) {
-            cell->setDefused(true);
+        for (Cell *cell : m_cells) {
+            if (cell->isMined() & cell->haveMine()) {
+                cell->setDefused(true);
+            }
+            cell->minedGameOver();
+            cell->setOpened(true);
         }
-        cell->minedGameOver();
-        cell->setOpened(true);
-    }
 
-    emit stopTimer();
+        emit stopTimer();
+    }
 }
 
 void Field::checkWin()

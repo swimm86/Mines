@@ -63,14 +63,22 @@ void Cell::open()
 
 void Cell::smartOpen()
 {
+    int minedCells = 0;
     for (Cell *cell : m_neighbors) {
-        if (!cell->isMined()) {
-            cell->setOpened(true);
-            emit checkWin();
+        if (cell->isMined()) {
+            minedCells++;
         }
+    }
+    if (minedCells == minesAround()) {
+        for (Cell *cell : m_neighbors) {
+            if (!cell->isMined()) {
+                cell->setOpened(true);
+                emit checkWin();
+            }
 
-        if (cell->isOpen() & cell->haveMine()) {
-            emit lose();
+            if (cell->isOpen() & cell->haveMine()) {
+                emit lose();
+            }
         }
     }
 }
